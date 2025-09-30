@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 84% 3%;
+    --foreground: 200 100% 95%;
+
+    --card: 222 84% 5%;
+    --card-foreground: 200 100% 95%;
+
+    --popover: 222 84% 5%;
+    --popover-foreground: 200 100% 95%;
+
+    --primary: 256 100% 70%;
+    --primary-foreground: 222 84% 3%;
+
+    --secondary: 222 84% 8%;
+    --secondary-foreground: 200 100% 95%;
+
+    --muted: 222 84% 10%;
+    --muted-foreground: 200 20% 65%;
+
+    --accent: 200 100% 60%;
+    --accent-foreground: 222 84% 3%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 200 100% 95%;
+
+    --border: 222 84% 15%;
+    --input: 222 84% 8%;
+    --ring: 256 100% 70%;
+
+    --radius: 0.75rem;
+
+    /* Enhanced Web3 color palette */
+    --neon-blue: 200 100% 65%;
+    --neon-purple: 270 100% 70%;
+    --neon-cyan: 180 100% 65%;
+    --neon-pink: 330 100% 70%;
+    --electric-blue: 210 100% 60%;
+    --dark-surface: 222 84% 4%;
+    --darker-surface: 222 84% 2%;
+
+    /* Enhanced gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--neon-purple)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--neon-purple)), hsl(var(--neon-pink)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--electric-blue)));
+    --gradient-background: radial-gradient(ellipse at top, hsl(var(--darker-surface)), hsl(222 84% 1%));
+
+    /* Enhanced shadows and effects */
+    --glow-primary: 0 0 40px hsl(var(--electric-blue) / 0.4);
+    --glow-secondary: 0 0 40px hsl(var(--neon-purple) / 0.4);
+    --glow-accent: 0 0 40px hsl(var(--neon-cyan) / 0.3);
+    --shadow-card: 0 20px 60px -10px hsl(222 84% 1% / 0.9);
+    --shadow-intense: 0 0 80px hsl(var(--electric-blue) / 0.2);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .light {
+    /* Light mode uses the same dark theme for web3 aesthetic */
+    --background: 222 84% 3%;
+    --foreground: 200 100% 95%;
+    --card: 222 84% 5%;
+    --card-foreground: 200 100% 95%;
+    --popover: 222 84% 5%;
+    --popover-foreground: 200 100% 95%;
+    --primary: 256 100% 70%;
+    --primary-foreground: 222 84% 3%;
+    --secondary: 222 84% 8%;
+    --secondary-foreground: 200 100% 95%;
+    --muted: 222 84% 10%;
+    --muted-foreground: 200 20% 65%;
+    --accent: 200 100% 60%;
+    --accent-foreground: 222 84% 3%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 200 100% 95%;
+    --border: 222 84% 15%;
+    --input: 222 84% 8%;
+    --ring: 256 100% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-background);
+    min-height: 100vh;
+  }
+
+  /* Enhanced Web3 utility classes */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-secondary {
+    box-shadow: var(--glow-secondary);
+  }
+
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+
+  .card-glow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-intense {
+    box-shadow: var(--shadow-intense);
+  }
+
+  /* Background overlays */
+  .bg-web3-overlay-1 {
+    background-image: url('/src/assets/web3-bg-1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .bg-web3-overlay-2 {
+    background-image: url('/src/assets/web3-bg-2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* Enhanced animations */
+  .pulse-glow {
+    animation: pulse-glow 3s infinite;
+  }
+
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 30px hsl(var(--electric-blue) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 60px hsl(var(--electric-blue) / 0.6), 0 0 100px hsl(var(--neon-purple) / 0.3);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
