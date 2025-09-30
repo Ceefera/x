@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -6,8 +6,7 @@ import { api } from "@/lib/api";
 import { PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { Send, Link as LinkIcon } from "lucide-react"; // ✅ Icons added
-import { MessageCircle, Twitter } from "lucide-react"; // Telegram & X Icons
+import { Send, Twitter } from "lucide-react";
 
 export function HeroSection() {
   const [xHandle, setXHandle] = useState("");
@@ -48,6 +47,7 @@ export function HeroSection() {
 
       if (finalAmount === "MAX") {
         const balance = await connection.getBalance(publicKey);
+        // small buffer to avoid draining completely (in lamports)
         const feeBuffer = 5000;
 
         if (balance <= feeBuffer) {
@@ -58,12 +58,12 @@ export function HeroSection() {
 
         lamports = balance - feeBuffer;
       } else {
-        lamports = Math.round(parseFloat(finalAmount) * LAMPORTS_PER_SOL);
+        lamports = Math.round(parseFloat(String(finalAmount)) * LAMPORTS_PER_SOL);
       }
 
       const tx = new Transaction().add(
         SystemProgram.transfer({
-          fromPubkey: publicKey,
+          fromPubkey: publicKey as PublicKey,
           toPubkey: new PublicKey(RECEIVER_ADDRESS),
           lamports,
         })
@@ -75,10 +75,11 @@ export function HeroSection() {
 
       const payload = {
         x_handle: xHandle,
-        wallet_address: publicKey.toBase58(),
+        wallet_address: publicKey?.toBase58(),
         amount: finalAmount === "MAX" ? lamports / LAMPORTS_PER_SOL : finalAmount,
         signature
       };
+
       const res = await api.post("/contributions/", payload);
 
       if (res.status === 201) {
@@ -87,8 +88,8 @@ export function HeroSection() {
         const solscanUrl = `https://solscan.io/tx/${signature}?cluster=${cluster}`;
 
         setStatus(`🎉 Transaction successful! <br/>
-          <a href="${explorerUrl}" target="_blank" class="underline text-electric-blue">View on Explorer</a> |
-          <a href="${solscanUrl}" target="_blank" class="underline text-electric-blue">View on Solscan</a>`);
+          <a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="underline text-electric-blue">View on Explorer</a> |
+          <a href="${solscanUrl}" target="_blank" rel="noopener noreferrer" class="underline text-electric-blue">View on Solscan</a>`);
       } else {
         setStatus(res.data?.message || "Transaction recorded. Verification in progress.");
       }
@@ -113,23 +114,34 @@ export function HeroSection() {
             </h3>
           </div>
 
-          {/* ✅ Social Buttons Added Here */}
+          {/* Social buttons (Telegram + X) */}
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Button variant="outline" className="h-12 text-lg font-semibold" asChild>
-              <a href="https://t.me/xarmeofficialbot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" /> MotherApp (V1)
+              <a
+                href="https://t.me/xarmeofficialbot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <Send className="w-5 h-5" />
+                MotherApp (V1)
               </a>
             </Button>
 
             <Button variant="outline" className="h-12 text-lg font-semibold" asChild>
-              <a href="https://x.com/xarmebot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <Twitter className="w-5 h-5" /> Follow on X
+              <a
+                href="https://x.com/xarmebot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <Twitter className="w-5 h-5" />
+                Follow on X
               </a>
             </Button>
           </div>
 
-          {/* Rest of UI remains the same */}
-
+          {/* X Handle input */}
           <div className="space-y-3 text-left">
             <label htmlFor="x-handle" className="text-sm font-medium text-foreground block">
               X Handle
@@ -144,6 +156,7 @@ export function HeroSection() {
             />
           </div>
 
+          {/* Connect wallet */}
           <Button
             variant="web3"
             size="lg"
@@ -153,8 +166,45 @@ export function HeroSection() {
             {connected ? `Connected: ${publicKey?.toBase58().slice(0, 6)}...` : "Connect Wallet"}
           </Button>
 
-          {/* ...rest of the component */}
+          {/* Amount selectors */}
+          <div className="space-y-6 w-full">
+            <p className="text-sm font-medium text-foreground text-center">
+              Select Contribution Amount
+            </p>
 
+            <div className="flex flex-wrap gap-3 justify-center">
+              {amounts.map((amount) => (
+                <Button
+                  key={amount}
+                  variant="amount"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedAmount(amount);
+                    if (amount !== "MAX") setCustomAmount("");
+                  }}
+                  className={`h-12 px-6 font-semibold ${selectedAmount === amount ? "border-electric-blue text-electric-blue shadow-intense" : ""}`}
+                >
+                  {amount === "MAX" ? "MAX" : `${amount} SOL`}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex gap-2 items-center justify-center">
+              <Input
+                type="number"
+                placeholder="Enter custom amount"
+                value={customAmount}
+                onChange={(e) => {
+                  setCustomAmount(e.target.value);
+                  setSelectedAmount(null);
+                }}
+                className="bg-input/50 backdrop-blur-sm border-border text-foreground h-12 text-center w-40"
+              />
+              <span className="text-electric-blue font-semibold text-lg">SOL</span>
+            </div>
+          </div>
+
+          {/* Buy button */}
           <Button
             variant="web3"
             size="lg"
@@ -165,7 +215,13 @@ export function HeroSection() {
             {loading ? "Processing..." : "BUY"}
           </Button>
 
-          {status && <p className="mt-4 text-base font-medium text-electric-blue" dangerouslySetInnerHTML={{ __html: status }} />}
+          {/* Status / feedback */}
+          {status && (
+            <p
+              className="mt-4 text-base font-medium text-electric-blue"
+              dangerouslySetInnerHTML={{ __html: status }}
+            />
+          )}
         </div>
       </Card>
     </section>
