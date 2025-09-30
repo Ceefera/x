@@ -1,1 +1,1 @@
-web: gunicorn xarm.xarm.wsgi:application
+web: gunicorn xarm.wsgi:application
