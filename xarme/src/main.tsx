@@ -8,7 +8,6 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  BackpackWalletAdapter,
   TorusWalletAdapter
 } from "@solana/wallet-adapter-wallets";
 
@@ -20,8 +19,7 @@ const endpoint =
 const wallets = [
   new PhantomWalletAdapter(),
   new SolflareWalletAdapter(),
-  new BackpackWalletAdapter(),
-  new TorusWalletAdapter(),
+  new TorusWalletAdapter()
 ];
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
