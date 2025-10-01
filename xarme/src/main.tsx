@@ -12,18 +12,9 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adap
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-// ✅ Auto-detect environment
-const IS_PRODUCTION = import.meta.env.PROD;
-
-// ✅ Force mainnet in production, fallback to devnet only locally (optional)
-const network = IS_PRODUCTION ? "mainnet-beta" : (import.meta.env.VITE_SOLANA_NETWORK || "devnet");
-
-// ✅ Try user-defined RPC first, if blocked, fallback to CORS-safe Helius RPC
-const endpoint = IS_PRODUCTION
-  ? (import.meta.env.VITE_SOLANA_RPC || "https://rpc.helius.xyz/?api-key=anonymous")
-  : (import.meta.env.VITE_SOLANA_RPC || "https://api.devnet.solana.com");
-
-console.log("🌐 Using Solana RPC:", endpoint);
+// ✅ Hardcode MAINNET only using Helius RPC
+const network = "mainnet-beta";
+const endpoint = "https://rpc.helius.xyz/?api-key=anonymous";
 
 const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
 

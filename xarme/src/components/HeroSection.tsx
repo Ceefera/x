@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -14,7 +14,6 @@ export function HeroSection() {
   const [customAmount, setCustomAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [walletNetwork, setWalletNetwork] = useState<string | null>(null); // ✅ NEW
 
   const amounts = ["0.5", "1", "2.5", "5", "10", "MAX"];
 
@@ -23,24 +22,11 @@ export function HeroSection() {
   const { setVisible } = useWalletModal();
 
   const RECEIVER_ADDRESS = import.meta.env.VITE_RECEIVER_ADDRESS || "REPLACE_WITH_RECEIVER_PUBKEY";
-  const CLUSTER = import.meta.env.VITE_SOLANA_NETWORK || "mainnet-beta";
+
+  // ✅ Always mainnet enforced
+  const isMainnet = connection.rpcEndpoint.includes("mainnet");
 
   const handleConnectWallet = () => setVisible(true);
-
-  // ✅ Detect RPC / Wallet network
-  useEffect(() => {
-    async function detectNetwork() {
-      try {
-        const version = await connection.getVersion();
-        if (version["solana-core"]) {
-          setWalletNetwork("mainnet-beta"); // Assume correct if using mainnet RPC
-        }
-      } catch (err) {
-        setWalletNetwork("unknown");
-      }
-    }
-    if (connected) detectNetwork();
-  }, [connected, connection]);
 
   const getFinalAmount = () => {
     if (selectedAmount === "MAX") {
@@ -51,10 +37,11 @@ export function HeroSection() {
   };
 
   const handleBuy = async () => {
+    if (!isMainnet) return setStatus("⚠️ Please switch your wallet to MAINNET to continue.");
+
     const finalAmount = getFinalAmount();
     if (!xHandle || !finalAmount) return setStatus("⚠️ Fill X handle and choose or enter amount.");
     if (!publicKey) return setStatus("⚠️ Please connect your wallet.");
-    if (walletNetwork !== "mainnet-beta") return setStatus("⚠️ Please switch your wallet to Mainnet Beta."); // ✅ BLOCK
     if (RECEIVER_ADDRESS === "REPLACE_WITH_RECEIVER_PUBKEY") return setStatus("⚠️ Receiver address not configured in env.");
 
     setLoading(true);
@@ -98,15 +85,8 @@ export function HeroSection() {
       const res = await api.post("/contributions/", payload);
 
       if (res.status === 201) {
-        const explorerUrl =
-          CLUSTER === "mainnet-beta"
-            ? `https://explorer.solana.com/tx/${signature}`
-            : `https://explorer.solana.com/tx/${signature}?cluster=${CLUSTER}`;
-
-        const solscanUrl =
-          CLUSTER === "mainnet-beta"
-            ? `https://solscan.io/tx/${signature}`
-            : `https://solscan.io/tx/${signature}?cluster=${CLUSTER}`;
+        const explorerUrl = `https://explorer.solana.com/tx/${signature}`;
+        const solscanUrl = `https://solscan.io/tx/${signature}`;
 
         setStatus(`🎉 Transaction successful! <br/>
           <a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="underline text-electric-blue">View on Explorer</a> |
@@ -126,13 +106,6 @@ export function HeroSection() {
     <section className="container mx-auto px-4 py-20">
       <Card className="max-w-2xl mx-auto p-10 bg-card/90 backdrop-blur-sm border-border shadow-intense hover:shadow-intense">
         <div className="text-center space-y-10">
-
-          {/* ✅ Network Alert */}
-          {connected && walletNetwork !== "mainnet-beta" && (
-            <p className="text-red-500 font-bold">⚠️ Switch to Mainnet Beta in your wallet</p>
-          )}
-
-          {/* Social + headline */}
           <div className="space-y-3">
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <Button variant="outline" className="h-12 text-lg font-semibold" asChild>
@@ -146,7 +119,6 @@ export function HeroSection() {
                   MotherApp (V1)
                 </a>
               </Button>
-
               <Button variant="outline" className="h-12 text-lg font-semibold" asChild>
                 <a
                   href="https://x.com/xarmebot"
@@ -233,7 +205,7 @@ export function HeroSection() {
             size="lg"
             className="w-full h-14 text-lg font-semibold"
             onClick={handleBuy}
-            disabled={loading || !connected || walletNetwork !== "mainnet-beta"} // ✅ Disable if wrong network
+            disabled={loading || !isMainnet}
           >
             {loading ? "Processing..." : "BUY"}
           </Button>
