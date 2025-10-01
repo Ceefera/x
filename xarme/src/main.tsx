@@ -1,24 +1,30 @@
-import { Buffer } from "buffer";
-window.Buffer = Buffer;
-
-import { createRoot } from "react-dom/client";
 import React from "react";
+import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
+import {
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  BackpackWalletAdapter,
+  TorusWalletAdapter
+} from "@solana/wallet-adapter-wallets";
 
-import "@solana/wallet-adapter-react-ui/styles.css";
+// ✅ Forced MAINNET using your Helius RPC
+const endpoint =
+  import.meta.env.VITE_SOLANA_NETWORK_RPC ||
+  "https://mainnet.helius-rpc.com/?api-key=dd83bdd4-73b2-48af-be72-96cbbe97c9a4";
 
-// ✅ Hardcode MAINNET only using Helius RPC
-const network = "mainnet-beta";
-const endpoint = "https://rpc.helius.xyz/?api-key=anonymous";
+const wallets = [
+  new PhantomWalletAdapter(),
+  new SolflareWalletAdapter(),
+  new BackpackWalletAdapter(),
+  new TorusWalletAdapter(),
+];
 
-const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
-
-createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
