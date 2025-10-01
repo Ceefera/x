@@ -12,8 +12,17 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adap
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-const network = import.meta.env.VITE_SOLANA_NETWORK || "devnet";
-const endpoint = import.meta.env.VITE_SOLANA_RPC || "https://api.devnet.solana.com";
+// ✅ Auto-detect environment
+const IS_PRODUCTION = import.meta.env.PROD;
+
+// ✅ Default to mainnet in production, devnet locally
+const network = IS_PRODUCTION
+  ? "mainnet-beta"
+  : (import.meta.env.VITE_SOLANA_NETWORK || "devnet");
+
+const endpoint = IS_PRODUCTION
+  ? (import.meta.env.VITE_SOLANA_RPC || "https://api.mainnet-beta.solana.com")
+  : (import.meta.env.VITE_SOLANA_RPC || "https://api.devnet.solana.com");
 
 const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
 

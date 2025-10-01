@@ -23,6 +23,9 @@ export function HeroSection() {
 
   const RECEIVER_ADDRESS = import.meta.env.VITE_RECEIVER_ADDRESS || "REPLACE_WITH_RECEIVER_PUBKEY";
 
+  // ✅ Default to mainnet-beta unless overridden
+  const CLUSTER = import.meta.env.VITE_SOLANA_NETWORK || "mainnet-beta";
+
   const handleConnectWallet = () => setVisible(true);
 
   const getFinalAmount = () => {
@@ -47,23 +50,20 @@ export function HeroSection() {
 
       if (finalAmount === "MAX") {
         const balance = await connection.getBalance(publicKey);
-        // small buffer to avoid draining completely (in lamports)
         const feeBuffer = 5000;
-
         if (balance <= feeBuffer) {
           setStatus("⚠️ Not enough SOL to cover network fees.");
           setLoading(false);
           return;
         }
-
         lamports = balance - feeBuffer;
       } else {
-        lamports = Math.round(parseFloat(String(finalAmount)) * LAMPORTS_PER_SOL);
+        lamports = Math.round(parseFloat(finalAmount) * LAMPORTS_PER_SOL);
       }
 
       const tx = new Transaction().add(
         SystemProgram.transfer({
-          fromPubkey: publicKey as PublicKey,
+          fromPubkey: publicKey,
           toPubkey: new PublicKey(RECEIVER_ADDRESS),
           lamports,
         })
@@ -83,9 +83,16 @@ export function HeroSection() {
       const res = await api.post("/contributions/", payload);
 
       if (res.status === 201) {
-        const cluster = import.meta.env.VITE_SOLANA_NETWORK || "devnet";
-        const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${cluster}`;
-        const solscanUrl = `https://solscan.io/tx/${signature}?cluster=${cluster}`;
+        // ✅ Mainnet: no ?cluster=
+        const explorerUrl =
+          CLUSTER === "mainnet-beta"
+            ? `https://explorer.solana.com/tx/${signature}`
+            : `https://explorer.solana.com/tx/${signature}?cluster=${CLUSTER}`;
+
+        const solscanUrl =
+          CLUSTER === "mainnet-beta"
+            ? `https://solscan.io/tx/${signature}`
+            : `https://solscan.io/tx/${signature}?cluster=${CLUSTER}`;
 
         setStatus(`🎉 Transaction successful! <br/>
           <a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="underline text-electric-blue">View on Explorer</a> |
@@ -102,6 +109,7 @@ export function HeroSection() {
   };
 
   return (
+    // untouched UI below...
     <section className="container mx-auto px-4 py-20">
       <Card className="max-w-2xl mx-auto p-10 bg-card/90 backdrop-blur-sm border-border shadow-intense hover:shadow-intense">
         <div className="text-center space-y-10">
