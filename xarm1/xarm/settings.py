@@ -1,29 +1,23 @@
 from pathlib import Path
-
 import dj_database_url
 import environ
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Initialise environment variables
 env = environ.Env(
-    DEBUG=(bool, False)  # Default debug = False
+    DEBUG=(bool, False)
 )
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY
 SECRET_KEY = env("SECRET_KEY", default="unsafe-secret-key")
+DEBUG = env("DEBUG", default=False)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])  # Replace "*" in production
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG", default=True)
-
-# Hosts allowed to connect
-#ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
-
-# Application definition
+# Applications
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,7 +46,7 @@ ROOT_URLCONF = "xarm.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "xarm/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -66,11 +60,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "xarm.wsgi.application"
 
-# Database (still sqlite for now)
+# Database
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
-    )
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
 }
 
 # Password validation
@@ -90,16 +82,23 @@ USE_TZ = True
 # Static files
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-TEMPLATES[0]["DIRS"] = [os.path.join(BASE_DIR, "xarm/templates")]
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "xarm/static")]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS (for frontend connection)
-CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=True)
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:5173"])
+# CORS
+CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["https://yourdomain.com"])
 
-# Custom env vars for Solana integration
-SOLANA_RPC = env("SOLANA_RPC", default="https://api.devnet.solana.com")
-RECEIVER_ADDRESS = env("RECEIVER_ADDRESS", default="")
+# Solana Mainnet setup
+SOLANA_NETWORK = env("SOLANA_NETWORK", default="mainnet-beta")
+SOLANA_RPC = env("SOLANA_RPC", default="https://api.mainnet-beta.solana.com")
+RECEIVER_ADDRESS = env("RECEIVER_ADDRESS", default=None)
+
+# Validate critical Solana settings
+if not RECEIVER_ADDRESS:
+    raise ValueError(
+        "⚠️ RECEIVER_ADDRESS is not set in environment variables! "
+        "Set it in .env or on your hosting platform."
+    )

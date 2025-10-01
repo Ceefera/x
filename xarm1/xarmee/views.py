@@ -20,16 +20,16 @@ class ContributionCreateView(generics.CreateAPIView):
         wallet_address = data.get("wallet_address")
         x_handle = data.get("x_handle")
 
-        # basic validation
+        # Basic validation
         if not all([signature, amount, wallet_address, x_handle]):
             return Response({"detail": "Missing fields"}, status=status.HTTP_400_BAD_REQUEST)
 
         if Contribution.objects.filter(signature=signature).exists():
             return Response({"detail": "Duplicate signature"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verify transaction on Solana RPC
+        # Verify transaction on Mainnet RPC
         try:
-            rpc_url = settings.SOLANA_RPC
+            rpc_url = settings.SOLANA_RPC  # This now points to mainnet-beta from settings.py
             payload = {
                 "jsonrpc": "2.0",
                 "id": 1,
