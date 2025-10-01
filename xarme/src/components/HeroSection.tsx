@@ -106,16 +106,7 @@ export function HeroSection() {
       <Card className="max-w-2xl mx-auto p-10 bg-card/90 backdrop-blur-sm border-border shadow-intense hover:shadow-intense">
         <div className="text-center space-y-10">
           <div className="space-y-3">
-            <h2 className="text-2xl md:text-3xl font-bold gradient-text">
-              Enter Mother App (V1)
-            </h2>
-            <h3 className="text-3xl md:text-4xl font-bold gradient-text-accent">
-              Join Our Community Sale to gain GTD access to Vault 2 during MotherApp(V2) Launch
-            </h3>
-          </div>
-
-          {/* Social buttons (Telegram + X) */}
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Button variant="outline" className="h-12 text-lg font-semibold" asChild>
               <a
                 href="https://t.me/xarmeofficialbot"
@@ -140,6 +131,13 @@ export function HeroSection() {
               </a>
             </Button>
           </div>
+            <h3 className="text-3xl md:text-4xl font-bold gradient-text-accent">
+              Join Our Community Sale to gain GTD access to Vault 2 during MotherApp(V2) Launch
+            </h3>
+          </div>
+
+          {/* Social buttons (Telegram + X) */}
+
 
           {/* X Handle input */}
           <div className="space-y-3 text-left">
