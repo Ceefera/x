@@ -25,7 +25,7 @@ const wallets = [
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <App />
         </WalletModalProvider>
