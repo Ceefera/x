@@ -11,15 +11,15 @@ import {
   TorusWalletAdapter
 } from "@solana/wallet-adapter-wallets";
 
-// ✅ Standardized Helius RPC (v1 format)
+// ✅ Forced MAINNET using your Helius RPC
 const endpoint =
   import.meta.env.VITE_SOLANA_NETWORK_RPC ||
-  "https://mainnet.helius-rpc.com/v1/dd83bdd4-73b2-48af-be72-96cbbe97c9a4";
+  "https://mainnet.helius-rpc.com/?api-key=dd83bdd4-73b2-48af-be72-96cbbe97c9a4";
 
 const wallets = [
   new PhantomWalletAdapter(),
   new SolflareWalletAdapter(),
-  new TorusWalletAdapter(),
+  new TorusWalletAdapter()
 ];
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
